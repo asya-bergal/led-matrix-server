@@ -49,9 +49,26 @@ def uploadTXT():
     glob.fn = "text.ppm"
     uploadPPM()
 
-def uploadPPM():
+def uploadPPM(ppm=None):
     stopLEDs()
-    str = ("./led-matrix -r 16 -c 3 -D 2 " + glob.fn)
+    if ppm:
+    	str = ("./led-matrix -r 16 -c 3 -D 2 " + ppm)
+    else:
+        str = ("./led-matrix -r 16 -c 3 -D 2 " + glob.fn)
+    runLEDs(str)
+
+def uploadHalfPPM(ppm1, ppm2):
+    stopLEDs()
+    str1 = ("./led-matrix -r 16 -c 3 -D 2 " + ppm1)
+    str2 = ("./led-matrix -r 16 -c 3 -D 2 " + ppm2)
+    runHalfLEDs(str1, str2)
+
+def uploadPPMNoScroll(ppm=None):
+    stopLEDs()
+    if ppm:
+        str = ("./led-matrix -r 16 -c 3 -D 1 -m 1000")
+    else:
+        str = ("./led-matrix -r 16 -c 3 -D 2")
     runLEDs(str)
 
 def uploadImage(image=None):
@@ -66,7 +83,15 @@ def stopLEDs():
     if glob.process != None:
         glob.process.stdin.write("\n")
         glob.process.terminate()
+    if glob.process1 != None:
+        glob.process1.terminate()
+    if glob.process2 != None:
+        glob.process2.terminate()
 
 def runLEDs(str):
     glob.process = subprocess.Popen("exec " + str, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def runHalfLEDs(str1, str2):
+    glob.process1 = subprocess.Popen("exec " + str1, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    glob.process2 = subprocess.Popen("exec " + str2, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 
